@@ -1,0 +1,67 @@
+Sample HTML:
+
+<th >Assessed improvements:</th>
+<td>$66,500.00</td>
+</tr>
+<tr>
+<th >Assessed total:</th>
+<td>
+$67,200.00</td>
+</tr>
+<tr>
+<th>Appraised total:</th>
+<td>
+$210,000.00
+<span class="redevdef">
+<a  href="#AppraiseddispPast" >
+(about this code)</a>
+</span>
+</td>
+
+# Above HTML Given by: 
+curl -v -L "https://www.stlouis-mo.gov/data/address-search/index.cfm?parcelId=22870001371&categoryBy=form.start,form.RealEstatePropertyInfor&firstview=true"
+
+
+List of addresses in format HANDLE,ADDRESS (HANDLE is the primary key of dataset, which is NOT the same as parcelID, but similar):
+
+cat stl-parcel-dataset-1.csv | tr -d '\r' | cut -d ',' -f 1,3 | tail -n +2
+
+# Stored in handle-addr-list.csv
+
+Start query formation on handle-addr-list.csv:
+cat handle-addr-list.csv | cut -d ',' -f 2 | sed 's/-[^ ]* / /' | sed 's/ /%20/g'
+  - incomplete; need streetnum, etc.
+
+Here: 
+cat stl-parcel-dataset-1.csv | tr -d '\r' | cut -d ',' -f 1,3,52,55 | tail -n +2 > handle-addr-list.csv 
+
+
+
+Get data based on address:
+curl -v -L "https://www.stlouis-mo.gov/data/address-search/index.cfm?&categoryBy=form.start,form.RealEstatePropertyInfor&firstview=true"
+
+https://www.stlouis-mo.gov/data/address-search/index.cfm?addr=616-622%20S%20%20%201ST%20ST&CategoryBy=form.start,form.RealEstatePropertyInfor&firstview=true
+
+Target:
+https://www.stlouis-mo.gov/data/address-search/index.cfm?addr=616-622%20S%20%20%201ST%20ST&stname=1ST&stnum=616&parcelId=00010000100&CategoryBy=form.start,form.RealEstatePropertyInfor&firstview=true
+
+
+
+GET LIST OF URLS: 
+cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/\([0-9]\)\([0-9]\{10\}\)/\20/' | sed 's/^/?parcelid=/' | sed 's/,/\&addr=/' | sed 's/,/\&stnum=/' | sed 's/,/\&stname=/' | sed 's/^/https:\/\/www.stlouis-mo.gov\/data\/address-search\/index.cfm/' | sed 's/$/\&CategoryBy=form.start,form.RealEstatePropertyInfor\&firstview=true/'
+
+
+...and then look for appraised value:
+
+| xargs curl -L | tr -d '\r\n' | egrep -o '<th>Appraised total:</th><td>[^<span]*'
+
+	- When run right after the list transformation, this sometimes outputs two values if the record contains one from 2017 and one from before 2017. Probably necessary to create list of URLs, curl (or wget?) them individually, and then take the top result.
+
+	- So, create command list from urls.txt:
+	cat urls.txt | sed 's/^/curl -L /' | sed 's/https:/\"https:/' | sed "s/$/\" | tr -d '\\\r\\\n' | egrep -o '<th>Appraised total:<\/th><td>[^<span]*' | head -n1/" > curl-urls.txt 
+
+
+
+
+
+
