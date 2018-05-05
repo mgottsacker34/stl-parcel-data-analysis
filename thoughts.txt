@@ -60,6 +60,13 @@ cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/\([0-9]\)\([0-9]\{10\}\)/\20
 	- So, create command list from urls.txt:
 	cat urls.txt | sed 's/^/curl -L /' | sed 's/https:/\"https:/' | sed "s/$/\" | tr -d '\\\r\\\n' | egrep -o '<th>Appraised total:<\/th><td>[^<span]*' | head -n1/" > curl-urls.txt 
 
+------
+05.02.18
+
+- will need to run several searches on HTML page. So, it will be better to download a copy of the HTML, and then cat it (rather than curling it each time)
+
+	- different command list from urls.txt
+	cat urls.txt | sed 's/^/wget /' | sed 's/wget [^parcelid=]*\([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)/wget -O \1/'
 
 
 
