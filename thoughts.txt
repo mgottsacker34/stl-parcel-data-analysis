@@ -66,7 +66,37 @@ cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/\([0-9]\)\([0-9]\{10\}\)/\20
 - will need to run several searches on HTML page. So, it will be better to download a copy of the HTML, and then cat it (rather than curling it each time)
 
 	- different command list from urls.txt
-	cat urls.txt | sed 's/^/wget /' | sed 's/wget [^parcelid=]*\([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)/wget -O \1/'
+	cat urls.txt | sed 's/^/wget /' | sed 's/wget [^parcelid=]*\([0-9]\{11\}\)/wget -O \1/'
+	- create earlier, from addr-list.csv:
+	cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/\([0-9]\)\([0-9]\{10\}\)/\20/' | sed 's/\([0-9]\{11\}\)/wget -O \1 <url>\1/' | sed 's/<url>/"https:\/\/www.stlouis-mo.gov\/data\/address-search\/index.cfm/' | sed 's/.cfm/.cfm?parcelid=/' | sed 's/,/\&addr=/' | sed 's/,/\&stnum=/' | sed 's/,/\&stname=/' | sed 's/$/\&CategoryBy=form.start,form.RealEstatePropertyInfor\&firstview=true"/' > wgetter.sh
+	Explanation:
+	cat handle-addr-list.csv | change spaces to %20 | change handle into parcelid format | put wget -O at beginning to specify an output file with the parcelid as its name. End with a <url> tag to indicate where url substitution should start, followed by the parcelid again | replace <url> tag with target url beginning | construct target url based on parcelid and address | append search criteria (RealEstatePropertyInfor, etc.)
+
+
+- Run wgetter.sh, and get a ton of HTML files named for parcel numbers. Put them in a folder called html-files.
+
+Okay, this is taking way too long. I need a way to parallelize this.
+I can use xargs. I might just worry about renaming the files afterdownloading all of them. That way, I can just cat the url list and xargs it. I will do it only on the files that have not yet be
+en downloaded, to save about 3600 wget requests.
+cat urls-pt2.txt | xargs -n 20 -P 8 wget -P ./html-files/
+
+Now, generate a report with parcel number, land use, zoning, assessed total, appraised total
+
+I think it would be best to use a bash program for this because it would be helpful to have variables that I can use to put into a report file. Creating reportgen.sh
+
+------
+05.06.18
+
+The parallelized wget commands finished sometime this morning. I have over 127,000 files total, but the ones produced from the parallelized process need to be renamed. I created rename-script.sh and tested it on a small subset of files. It renames every file to be just its parcelid by running the following command for every file:
+mv "$f" "`echo $f | sed 's/.*\([0-9]\{11\}\).*/\1/'`"
+
+I created a directory with all of the html files to be renamed. Will join with the correctly named html files that I got with the unparallelized wgetter.sh.
+
+I updated reportgen.sh to get all four tags that Andrew wants. I might want to use `tee` because it seems like it takes a long time.
+
+- renaming is a pretty heavy process. I do not need to that; instead, I can just get the parcelid from the URL at the same time that I process it all. Result in reportgen2.sh
+
+	- Run reportgen2.sh over all remaining files...This will take a long time.
 
 
 
