@@ -94,11 +94,14 @@ I created a directory with all of the html files to be renamed. Will join with t
 
 I updated reportgen.sh to get all four tags that Andrew wants. I might want to use `tee` because it seems like it takes a long time.
 
-- renaming is a pretty heavy process. I do not need to that; instead, I can just get the parcelid from the URL at the same time that I process it all. Result in reportgen2.sh
+- renaming is a pretty heavy process. I do not need to do that; instead, I can just get the parcelid from the URL at the same time that I process it all. Result in reportgen2.sh
 
 	- Run reportgen2.sh over all remaining files...This will take a long time.
 
+- Finished gathering. As I was joining the list from the first set of wgets with the second, I realized some of the entries in the Zoning field had 'Zoning:' there. After examining the website, I saw that these properties did not have entries for Zoning, and the Kleene star must have been grabbing a lot more than I wanted. So I changed the *'s to +'s to force it to have at least one character. If no entry, it should put nothing except a tab character in the report.
+	- My fix seems to be working. I'll run it on all the files now.
+	- I ran the parallelized wget on all the files that I got in the first part (urls-pt1). This way, they are all saved in the same naming format, and I'll just run the text processing on all of them in one go so I won't have to join two lists later.
 
-
+Finished running the new script on all the HTML files. I have a .tsv file with all the data gleaned from the website. About 3% of the files gave no information on the given fields. That 3% are parcels with data points that did not fit the generic URL format of the others.
 
 
