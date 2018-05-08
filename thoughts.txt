@@ -48,7 +48,7 @@ https://www.stlouis-mo.gov/data/address-search/index.cfm?addr=616-622%20S%20%20%
 
 
 GET LIST OF URLS: 
-cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/\([0-9]\)\([0-9]\{10\}\)/\20/' | sed 's/^/?parcelid=/' | sed 's/,/\&addr=/' | sed 's/,/\&stnum=/' | sed 's/,/\&stname=/' | sed 's/^/https:\/\/www.stlouis-mo.gov\/data\/address-search\/index.cfm/' | sed 's/$/\&CategoryBy=form.start,form.RealEstatePropertyInfor\&firstview=true/'
+cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/[0-9]\([0-9]\{10\}\)/\10/' | sed 's/^/?parcelid=/' | sed 's/,/\&addr=/' | sed 's/,/\&stnum=/' | sed 's/,/\&stname=/' | sed 's/^/https:\/\/www.stlouis-mo.gov\/data\/address-search\/index.cfm/' | sed 's/$/\&CategoryBy=form.start,form.RealEstatePropertyInfor\&firstview=true/'
 
 
 ...and then look for appraised value:
@@ -68,7 +68,7 @@ cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/\([0-9]\)\([0-9]\{10\}\)/\20
 	- different command list from urls.txt
 	cat urls.txt | sed 's/^/wget /' | sed 's/wget [^parcelid=]*\([0-9]\{11\}\)/wget -O \1/'
 	- create earlier, from addr-list.csv:
-	cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/\([0-9]\)\([0-9]\{10\}\)/\20/' | sed 's/\([0-9]\{11\}\)/wget -O \1 <url>\1/' | sed 's/<url>/"https:\/\/www.stlouis-mo.gov\/data\/address-search\/index.cfm/' | sed 's/.cfm/.cfm?parcelid=/' | sed 's/,/\&addr=/' | sed 's/,/\&stnum=/' | sed 's/,/\&stname=/' | sed 's/$/\&CategoryBy=form.start,form.RealEstatePropertyInfor\&firstview=true"/' > wgetter.sh
+	cat handle-addr-list.csv | sed 's/ /%20/g' | sed 's/[0-9]\([0-9]\{10\}\)/\10/' | sed 's/\([0-9]\{11\}\)/wget -O \1 <url>\1/' | sed 's/<url>/"https:\/\/www.stlouis-mo.gov\/data\/address-search\/index.cfm/' | sed 's/.cfm/.cfm?parcelid=/' | sed 's/,/\&addr=/' | sed 's/,/\&stnum=/' | sed 's/,/\&stname=/' | sed 's/$/\&CategoryBy=form.start,form.RealEstatePropertyInfor\&firstview=true"/' > wgetter.sh
 	Explanation:
 	cat handle-addr-list.csv | change spaces to %20 | change handle into parcelid format | put wget -O at beginning to specify an output file with the parcelid as its name. End with a <url> tag to indicate where url substitution should start, followed by the parcelid again | replace <url> tag with target url beginning | construct target url based on parcelid and address | append search criteria (RealEstatePropertyInfor, etc.)
 
@@ -104,4 +104,7 @@ I updated reportgen.sh to get all four tags that Andrew wants. I might want to u
 
 Finished running the new script on all the HTML files. I have a .tsv file with all the data gleaned from the website. About 3% of the files gave no information on the given fields. That 3% are parcels with data points that did not fit the generic URL format of the others.
 
+------
+05.07.18
 
+Last touch up: Make reportgen.sh more UNIX tool-like by having it echo to STDOUT rather than into a file immediately. Redirected the makefile to update accordingly.

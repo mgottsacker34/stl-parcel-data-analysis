@@ -8,7 +8,7 @@ html-files: urls.txt
 	cat urls.txt | xargs -n 20 -P 8 wget -P ./html-files/
 
 parcel-report.tsv: html-files/* reportgen.sh
-	bash reportgen.sh
+	bash reportgen-echo.sh > @a
 
 parcel-report-wo-blanks.tsv: parcel-report.tsv
 	cat parcel-report.tsv | egrep -v '\t\t\t\t' | sort > @a
