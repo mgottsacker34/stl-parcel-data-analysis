@@ -24,9 +24,15 @@ I had over 127,000 HTML files after the above process finished. It took several 
 
 `cat parcel-report.tsv | egrep -v '\t\t\t\t' | sort > parcel-report-wo-blanks.tsv`
 
-3% of the entries in the parcel-report file were blank. After further investigation, these files seemed to be produced when the web searcher returned multiple results for the given URL or when the parcel simply had no data for those fields. In the first case, it is necessary to search only on the address instead of the parcel ID. The web app will return links to the multiple parcel IDs. An extension of this project will devise a way to deal with those cases. While that will take more creativity, it should be noted that with the large number of successful entries, Andrew will be able to produce meaningful maps with the .tsv file as is.
+3% of the entries in the parcel-report file were blank. After further investigation, these files seemed to be produced when the web searcher returned multiple results for the given URL or when the parcel simply had no data for those fields. In the first case, it is necessary to search only on the address instead of the parcel ID. The web app will return links to the multiple parcel IDs. An extension of this project will devise a way to deal with those cases. While that will take more creativity, it should be noted that with the large number of successful entries, Andrew will be able to produce meaningful maps with the .tsv file as is because the maps will depend on averages.
 
-Note: The process described here is a condensed version of the development process. I kept track of more intricate details of my progress in the file [thoughts.txt](./unused/thoughts.txt). In addition, all of the files I wrote or generated but did not end up using ended up in the ./unused folder.
+I made a [makefile](./makefile) which can be used to build each step described here.
+
+### Quick data facts
+The first dataset ([stl-parcel-dataset-1.csv](./stl-parcel-dataset-1.csv)) is 48.5 MB. All of the downloaded HTML files came to 6.06 GB. The resultant .tsv file is 6.73 MB.
+
+#### Note
+The process described here is a condensed version of the development process. I kept track of more intricate details of my progress in the file [thoughts.txt](./thoughts.txt). In addition, all of the files I wrote or generated but did not end up using ended up in the [unused folder](./unused/).
 
 
 
